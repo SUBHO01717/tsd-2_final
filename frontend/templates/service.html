@@ -30,7 +30,9 @@
                 {% for cat in category %}
                 <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="service-item rounded overflow-hidden">
-                        
+                        {% if cat.image %}
+                        <img class="img-fluid" src="{{cat.image.url}}" alt="">
+                        {% endif %}
                         <div class="position-relative p-4 pt-0">
                             <h4 class="mb-3 pt-2">{{cat.name}}</h4>
                           

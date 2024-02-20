@@ -126,3 +126,24 @@ def CustomerProfileUpdate(request):
         'customer_form': customer_form,
     }
     return render(request, 'customer/customer_profile_update.html', context)
+
+
+@login_required
+def StaffProfileUpdate(request):
+    if request.method == 'POST':
+        user_form = UpdateStaffProfileForm1(request.POST, instance=request.user)
+        customer_form = UpdateStaffProfileForm2(request.POST,request.FILES, instance=request.user.userprofile)
+
+        if user_form.is_valid() and customer_form.is_valid():
+            user_form.save()
+            customer_form.save()
+            return redirect('dashboard')  # Redirect to the profile page after successful update
+    else:
+        user_form = UpdateStaffProfileForm1(instance=request.user)
+        customer_form = UpdateStaffProfileForm2(instance=request.user.userprofile)
+
+    context = {
+        'user_form': user_form, 
+        'customer_form': customer_form,
+    }
+    return render(request, 'staff_profile_update.html', context)

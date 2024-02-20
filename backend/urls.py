@@ -6,6 +6,7 @@ from accounts.views import *
 urlpatterns = [
    path('quotation_create', QuotationCreate, name='quotation_create'),
    path('dashboard', UserDashboard, name='dashboard'),
+   path('staff_profile', StaffProfileUpdate, name='staff_profile'),
    path('get-subcategories/<int:category_id>/', get_subcategories, name='get_subcategories'),
 
    path('create_order/<int:pk>', CreateOrder, name='create_order'),

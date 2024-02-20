@@ -25,7 +25,6 @@ def Services(request):
     }
     return render (request, 'service.html',context )
 
-
 def CatgoryDetails(request,slug):
     category = Category.objects.get(slug=slug,)
     subcategories = SubCategory.objects.filter(category=category,)
@@ -44,10 +43,8 @@ def ServiceDetails(request,pk):
     }
     return render (request, 'single_service_details.html',context )
 
-
 def GetQuote(request):
     return render (request, 'quote.html',)
-
 
 def Contact_page(request):
     if request.method == 'POST':
@@ -65,7 +62,6 @@ def Contact_page(request):
 
     # If the request method is GET (or any method other than POST), render the contact.html template
     return render(request, 'contact.html')
-
 
 def JobRequest(request):
     jobs=Job.objects.all()
@@ -96,11 +92,9 @@ def job_application(request):
     
     return render(request, 'job_application_form.html', {'form': form})
 
-
 def Thanks(request):
 
     return render(request,'thanks.html')
-
 
 def CreateCategory(request):
     category_all=Category.objects.all()
@@ -139,7 +133,6 @@ def EditCategory(request,pk):
         'category_all':category_all
     }
     return render(request, 'update_category.html', context)
-
 
 def CreateSubCategory(request):
     subcategory_all=SubCategory.objects.all()
@@ -180,8 +173,6 @@ def EditSubCategory(request,pk):
     }
     return render(request, 'update_sub_category.html', context)
 
-
-
 def JobApplicationsAll(request):
     
     applications=JobApplication.objects.all()
@@ -191,3 +182,13 @@ def JobApplicationsAll(request):
     }
 
     return render(request,'all_job_applications.html',context)
+
+def AllQuery(request):
+    
+    queries=Contact.objects.all()
+    
+    context={
+        'queries':queries
+    }
+
+    return render(request,'all_query.html',context)

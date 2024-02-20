@@ -18,6 +18,7 @@ urlpatterns = [
     path('create_sub_category/',CreateSubCategory,name="create_sub_category"),
     path('update_sub_category/<int:pk>/',EditSubCategory,name="update_sub_category"),
     path('all_job_applications/',JobApplicationsAll,name="all_job_applications"),
+    path('all_query/',AllQuery,name="all_query"),
   
    
    

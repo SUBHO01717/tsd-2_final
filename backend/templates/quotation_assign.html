@@ -8,10 +8,19 @@
         <div class="row">
             <!-- Sidebar -->
             <div class="col-lg-2 col-12 py-5" style="background-color: #0F1035;">
+                <div style="display: flex; justify-content: center;">
+                    {% if request.user.userprofile.profile_image %}
+                    <img src="{{ request.user.userprofile.profile_image.url }}" alt="" style="border-radius: 50%; width: 150px; height: 150px;">
+                    {% else %}
+                        <!-- Default image or alternative content -->
+                    
+                    {% endif %}
                 
+                </div>
+                <hr>
                 <a href="{% url "dashboard" %}" ><h5 class="text-white mb-4">Dashboard</h5></a>
                 <hr>
-                <a href=""><i class="fa fa-user-alt me-3"></i> Update Profile</a>
+                <a href="{% url 'staff_profile'%}"><i class="fa fa-user-alt me-3"></i> Update Profile</a>
                 <hr>
                 <a href="{% url 'quotation_list'%}" style="display: block; margin-bottom: 15px;">
                     <i class="fas fa-list me-3"></i>All Quotations
@@ -33,11 +42,15 @@
                 <a href="{% url 'create_category' %}" style="display: block; margin-bottom: 15px;">
                     <i class="fas fa-list me-3"></i>Create Category
                 </a>
-                <a href="" style="display: block; margin-bottom: 15px;">
+                <a href="{% url 'create_sub_category' %}" style="display: block; margin-bottom: 15px;">
                     <i class="fas fa-list me-3"></i>Create Sub-Category
                 </a>
+              
                 <a href="{% url 'all_job_applications' %}" style="display: block; margin-bottom: 15px;">
                     <i class="fas fa-list me-3"></i>Job Applications
+                </a>
+                <a href="{% url 'all_query' %}" style="display: block; margin-bottom: 15px;">
+                    <i class="fas fa-list me-3"></i>All Query
                 </a>
               
                 <hr>

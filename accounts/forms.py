@@ -24,3 +24,14 @@ class UpdateCustomerProfileForm2(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['phone','address', 'city', 'postal_code', 'profile_image',]
+
+
+class UpdateStaffProfileForm1(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name','last_name']
+
+class UpdateStaffProfileForm2(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['phone','address', 'city', 'postal_code', 'profile_image',]
