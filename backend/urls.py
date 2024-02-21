@@ -41,6 +41,8 @@ urlpatterns = [
    path('service_man_quotation_list', ServiceManQuotationList, name="service_man_quotation_list"),
    path('service_man_quotation_detail/<int:pk>', ServiceManQuotationDetails, name="service_man_quotation_detail"),
    path('service_man_order_detail/<int:pk>', ServiceManOrderDetails, name="service_man_order_detail"),
+
+   path('permission_denied', Permission_Denied, name="permission_denied"),
    
    
 ]

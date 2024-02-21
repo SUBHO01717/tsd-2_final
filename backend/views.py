@@ -12,9 +12,10 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from decimal import Decimal 
-
+from . decorators import *
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Customer"])
 def QuotationCreate(request):
     categories = Category.objects.all()
     subcategories = SubCategory.objects.all()
@@ -46,7 +47,9 @@ def get_subcategories(request, category_id):
     subcategories = SubCategory.objects.filter(category_id=category_id).values('id', 'name')
     return JsonResponse(list(subcategories), safe=False)
 
+
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def UserDashboard(request):
     quotation=Quotation.objects.order_by('-quotation_number')[:5]
     orders=Order.objects.order_by('-order_number')[:5]
@@ -75,6 +78,7 @@ def UserDashboard(request):
     return render(request, 'dashboard.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def QuotaionDetails(request,pk):
 
     quotation=Quotation.objects.get(pk=pk)
@@ -86,6 +90,7 @@ def QuotaionDetails(request,pk):
     return render(request, 'quotation_deatils.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def QuotationAssign(request, pk):
     quotation = Quotation.objects.get(pk=pk)
     
@@ -106,6 +111,7 @@ def QuotationAssign(request, pk):
     return render(request, 'quotation_assign.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def QuotationList(request):
         
         quotations_list=Quotation.objects.order_by('-quotation_number')
@@ -133,6 +139,7 @@ def QuotationList(request):
         return render(request, 'quotations_list.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Trade Person"])
 def create_quotation_pricing(request, pk):
     quotation = Quotation.objects.get(pk=pk)
 
@@ -160,7 +167,9 @@ def create_quotation_pricing(request, pk):
     }
     return render(request, 'quotation_assement.html', context)
 
+
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def OrderDetails(request, pk):
     order=Order.objects.get(pk=pk)
     
@@ -176,6 +185,7 @@ def OrderDetails(request, pk):
     return render(request,'order_details.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff",])
 def OrderAssign(request, pk):
     order = Order.objects.get(pk=pk)
     
@@ -196,7 +206,9 @@ def OrderAssign(request, pk):
     
     return render(request, 'order_assign.html', context)
 
+
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def OrderList(request):
     order_list = Order.objects.order_by('-order_number')
     
@@ -215,7 +227,10 @@ def OrderList(request):
 
     return render(request, 'order_list.html', context)
 
+
+
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def CustomerList(request):
     customer_list = User.objects.filter(userprofile__userrole='Customer')
 
@@ -226,6 +241,7 @@ def CustomerList(request):
     return render(request, 'customer_list.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def ServiceManList(request):
     service_man_list = User.objects.filter(userprofile__userrole='Trade Person')
 
@@ -235,7 +251,9 @@ def ServiceManList(request):
     }
     return render(request, 'service_man_list.html', context)
 
+
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def CustomerDetails(request, pk):
     customer = get_object_or_404(User, userprofile__userrole='Customer', pk=pk)
     
@@ -245,6 +263,7 @@ def CustomerDetails(request, pk):
     return render(request, 'customer_details.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def ServiceManDetails(request, pk):
     service_man = get_object_or_404(User, userprofile__userrole='Trade Person', pk=pk)
     
@@ -254,6 +273,7 @@ def ServiceManDetails(request, pk):
     return render(request, 'traders_details.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Customer"])
 def CreateOrder(request, pk):
     quotation = get_object_or_404(Quotation, id=pk)
     quotation_pricing_items = QuotationPricing.objects.filter(quotation=quotation)
@@ -302,6 +322,7 @@ def QuotationPricingView(request, pk):
     return render(request, 'serviceman/quotation_pricing.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Trade Person"])
 def EditQuotationPricing(request, pk):
     quotation = Quotation.objects.get(pk=pk)
     quotation_pricing_items = QuotationPricing.objects.filter(quotation=quotation)
@@ -352,6 +373,7 @@ def GeneratePDF(request, pk):
     return render(request, 'quotation_PDF.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Customer"])
 def CustomerDashboard(request):
     user_email = request.user.email
     quotation=Quotation.objects.filter(customer__email=user_email)
@@ -371,6 +393,7 @@ def CustomerDashboard(request):
 
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Customer"])
 def CustomerQuotationList(request):
     user_email = request.user.email
     
@@ -384,6 +407,7 @@ def CustomerQuotationList(request):
     return render(request, 'customer/customer_quotations_list.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Customer"])
 def CustomerOrderList(request):
     user_email = request.user.email
     
@@ -400,6 +424,7 @@ def CustomerOrderList(request):
     return render(request, 'customer/customer_order_list.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Customer"])
 def CustomerQuotationDetails(request, pk):
     user_email = request.user.email
     quotation=Quotation.objects.get(customer__email=user_email, pk=pk)
@@ -411,6 +436,7 @@ def CustomerQuotationDetails(request, pk):
 
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Customer"])
 def CustomerOrderDetails(request, pk):
     user_email = request.user.email
     quotation = get_object_or_404(Quotation, customer__email=user_email)
@@ -427,6 +453,7 @@ def CustomerOrderDetails(request, pk):
     return render(request, 'customer/customer_order_details.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Trade Person"])
 def ServiceManDashboard(request):
   
     # Retrieve the UserProfile associated with the logged-in user
@@ -452,6 +479,7 @@ def ServiceManDashboard(request):
     return render(request, 'serviceman/service_man_dashboard.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Trade Person"])
 def ServiceManOrderList(request):
     service_man_profile = UserProfile.objects.get(user=request.user)
     orders = Order.objects.filter(assigned_to=service_man_profile)
@@ -464,6 +492,7 @@ def ServiceManOrderList(request):
     return render(request, 'serviceman/serviceman_order_list.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Trade Person"])
 def ServiceManQuotationList(request):
     service_man_profile = UserProfile.objects.get(user=request.user)
     quotations_list = Quotation.objects.filter(assigned_to=service_man_profile)
@@ -475,7 +504,9 @@ def ServiceManQuotationList(request):
 
     return render(request, 'serviceman/serviceman_quotations_list.html', context)
 
+
 @login_required(login_url='login')
+@role_required(allowed_roles=["Trade Person"])
 def ServiceManQuotationDetails(request,pk):
 
     service_man_profile = UserProfile.objects.get(user=request.user)
@@ -488,6 +519,7 @@ def ServiceManQuotationDetails(request,pk):
     return render(request, 'serviceman/service_quotation_deatils.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Trade Person"])
 def ServiceManOrderDetails(request,pk):
 
     service_man_profile = UserProfile.objects.get(user=request.user)
@@ -505,6 +537,7 @@ def ServiceManOrderDetails(request,pk):
     return render(request, 'serviceman/service_order_deatils.html', context)
 
 @login_required(login_url='login')
+@role_required(allowed_roles=["Customer"])
 def CustomerQuotationPricingView(request, pk):
     quotation = Quotation.objects.get(pk=pk)
     quotation_pricing_items = QuotationPricing.objects.filter(quotation=quotation)
@@ -521,3 +554,8 @@ def CustomerQuotationPricingView(request, pk):
     }
 
     return render(request, 'customer/quotation_pricing.html', context)
+
+
+def Permission_Denied(request):
+
+    return render(request, "unauthorized.html")

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from .models import *
 import threading
 from django.contrib.auth.decorators import login_required
-
+from backend.decorators import *
 from .forms import *
 from .models import UserProfile
 
@@ -86,7 +86,8 @@ def UserLogout(request):
     return redirect("login")
 
 
-@login_required
+@login_required(login_url='login')
+@role_required(allowed_roles=["Trade Person"])
 def ServiceManProfileUpdate(request):
     if request.method == 'POST':
         user_form = UpdateServicemanProfileForm1(request.POST, instance=request.user)
@@ -107,7 +108,9 @@ def ServiceManProfileUpdate(request):
     return render(request, 'serviceman/serviceman_profile_update.html', context)
 
 
-@login_required
+
+@login_required(login_url='login')
+@role_required(allowed_roles=["Customer"])
 def CustomerProfileUpdate(request):
     if request.method == 'POST':
         user_form = UpdateCustomerProfileForm1(request.POST, instance=request.user)
@@ -128,7 +131,8 @@ def CustomerProfileUpdate(request):
     return render(request, 'customer/customer_profile_update.html', context)
 
 
-@login_required
+@login_required(login_url='login')
+@role_required(allowed_roles=["Staff"])
 def StaffProfileUpdate(request):
     if request.method == 'POST':
         user_form = UpdateStaffProfileForm1(request.POST, instance=request.user)
