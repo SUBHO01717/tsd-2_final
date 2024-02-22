@@ -2,10 +2,30 @@
 {% load static %}
 {% block content %}
 
+<style>
+    .box {
+        border: 1px solid white;
+        border-radius: 15px;
+        box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5); /* Changing shadow color to white */
+        position: relative;
+        transition: all 0.5s ease; /* Adding transition for smooth animation */
+    }
+
+    .box:hover {
+        background-color: white;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); /* Default box shadow */
+        transform: scale(1.090); /* Scaling up by 1.5% */
+    }
+
+    .box:hover .text-white {
+        color: #32C36C !important; /* Changing text color to black on hover */
+    }
+</style>
+
 
 
     <!-- Page Header Start -->
-    <div class="container-fluid page-header py-5 mb-5">
+    <div class="container-fluid page-header py-5 ">
         <div class="container py-5">
             <h1 class="display-3 text-white mb-3 animated slideInDown">Services</h1>
             <nav aria-label="breadcrumb animated slideInDown">
@@ -18,6 +38,51 @@
     </div>
     <!-- Page Header End -->
 
+ <!-- Press Flow  -->
+ <div class="container-fluid py-5" style="background-color:#32C36C;">
+    <div class="container">
+        <h1 class="pb-5 text-center text-white">OUR PROCESS</h1>
+        <div class="row">
+            <div class="col-3">
+                <div class="h-100 p-3 box" >
+                    <h3 class="text-white mb-3">STEP-1</h3>
+                    <div class="step-content">
+                        <h5 class="text-white">Post Your Job to TSD Traders</h5>
+                        <p class="text-white"> Tell us about your job, and we'll alert suitable tradespeople in your area. It’s simple and free.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="h-100 p-3 box"  >
+                    <h3 class="text-white mb-3 ">STEP-2</h3>
+                    <div class="step-content">
+                        <h5 class="text-white">We Send Your Job to Tradespeople</h5>
+                        <p class="text-white"> Once your job is posted, you'll get responses from interested tradespeople through the website.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="h-100 p-3 box"  >
+                    <h3 class="text-white mb-3 ">STEP-3</h3>
+                    <div class="step-content">
+                        <h5 class="text-white">Receive Free Quotes</h5>
+                        <p class="text-white"> You will receive quotes from tradespeople along with their profiles to review previous works & testimonials.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="h-100 p-3 box"  >
+                    <h3 class="text-white mb-3 ">STEP-4</h3>
+                    <div class="step-content">
+                        <h5 class="text-white">Pick the TradesPerson for Your Job</h5>
+                        <p class="text-white"> Choose the tradesperson you want to carry out your job!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ <!-- Press Flow Header End -->
 
     <!-- Service Start -->
     <div class="container-xxl py-5">

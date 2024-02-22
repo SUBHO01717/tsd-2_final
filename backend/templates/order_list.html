@@ -118,7 +118,6 @@
                                         <td>{{order.order_number}}</td>
                                         <td>&#163; {{order.order_amount}}</td>
                                         <td>&#163; {{order.paid_amount}}</td>
-                                        <td><a href="{% url 'service_man_details' pk=order.assigned_to.id %}">{{order.assigned_to}}</a></td>
                                         <td>{{order.status}}</td>
                                         <td>
                                               <a href="{% url 'order_deatils' order.pk %}" class="btn btn-primary btn-sm">Details</a> |

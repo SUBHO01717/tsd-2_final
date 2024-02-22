@@ -43,6 +43,5 @@ urlpatterns = [
    path('service_man_order_detail/<int:pk>', ServiceManOrderDetails, name="service_man_order_detail"),
 
    path('permission_denied', Permission_Denied, name="permission_denied"),
-   
-   
+      
 ]

@@ -60,7 +60,7 @@
             <div class="col-lg-10 col-12">
                 <div class="card mt-5 mb-3 shadow">
                     <div class="card-body">
-                        <h5 class="card-title">Detail of Quotation # - {{order.order_number}} & Check Quotation Deatils <a href="{% url 'quotation_deatils' pk=order.quotation.pk %}">{{order.quotation.quotation_number}}</a></h5>
+                        <h5 class="card-title">Detail of Order # - {{order.order_number}} </h5>
                         <hr>
                         <table style="width:50%; color:black;" class="table table-responsive">
                             
@@ -78,7 +78,7 @@
                             </tr>
                             <tr>
                               <th class="py-2">Customer Email</th>
-                              <td class="py-2">{{order.quotation.email}}</td>
+                              <td class="py-2">{{order.quotation.customer.email}}</td>
                             </tr>
                             <tr>
                               <th class="py-2">Customer Phone</th>
@@ -106,7 +106,7 @@
                             </tr>
                             <tr>
                                 <th class="py-2">Property Ownership </th>
-                                <td class="py-2">{{order.quotation.property_ownership}}</td>
+                                <td class="py-2">{{order.quotation.ownership}}</td>
                             </tr>
                             <tr>
                                 <th class="py-2">Order Status </th>
