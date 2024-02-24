@@ -4,22 +4,44 @@ from frontend.models import *
 from accounts.models import *
 from . forms import *
 from . models import *
-from django.db.models import Count, Q, Sum  
+from django.db.models import Count, Q, Sum
 import json
 from django.contrib.auth.models import User
 from django.forms import modelformset_factory
 from django.contrib import messages
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from decimal import Decimal 
+from decimal import Decimal
 from . decorators import *
+
+import threading
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
+
+def send_qoutaion_confirm(user_email, user_name):
+    subject = "TSD Traders - Received a Quotation Request"
+    from_email = "info@tsdtraders.com"
+    html_message = render_to_string('backend_email/quotation.html', {'user_email': user_email, 'user_name': user_name})
+    plain_message = strip_tags(html_message)
+
+    # List of recipients
+    recipients = [user_email, 'info@tsdtraders.com']
+
+    # Pass recipients directly, without wrapping it in another list
+    email = EmailMultiAlternatives(subject, plain_message, from_email, to=recipients)
+    email.attach_alternative(html_message, "text/html")
+    email.send()
+
+
 
 @login_required(login_url='login')
 @role_required(allowed_roles=["Customer"])
 def QuotationCreate(request):
     categories = Category.objects.all()
     subcategories = SubCategory.objects.all()
-    
+
     if request.method == 'POST':
         quotation_form = QuotationForm(request.POST)
         formset = ImageFormSet(request.POST, request.FILES)
@@ -28,11 +50,12 @@ def QuotationCreate(request):
             quotation = quotation_form.save(commit=False)
             # Set the logged-in user as the customer
             quotation.customer = request.user
-            
+            email_thread = threading.Thread(target=send_qoutaion_confirm, args=(request.user.email,quotation.full_name))
+            email_thread.start()
             quotation.save()
-            
+
             instances = formset.save(commit=False)
-            
+
             for instance in instances:
                 instance.quotation = quotation
                 instance.save()
@@ -59,8 +82,8 @@ def UserDashboard(request):
     all_serviceman_count = User.objects.filter(userprofile__userrole='Trade Person').count()
     all_quotation_count = Quotation.objects.all().count()
     all_order_count = Order.objects.all().count()
-  
-    
+
+
 
     context={
         'quotation':quotation,
@@ -71,8 +94,8 @@ def UserDashboard(request):
         'all_serviceman_count':all_serviceman_count,
         'all_quotation_count':all_quotation_count,
         'all_order_count':all_order_count,
-       
-      
+
+
     }
 
     return render(request, 'dashboard.html', context)
@@ -82,7 +105,7 @@ def UserDashboard(request):
 def QuotaionDetails(request,pk):
 
     quotation=Quotation.objects.get(pk=pk)
-    
+
     context={
         'quotation':quotation
     }
@@ -93,7 +116,7 @@ def QuotaionDetails(request,pk):
 @role_required(allowed_roles=["Staff"])
 def QuotationAssign(request, pk):
     quotation = Quotation.objects.get(pk=pk)
-    
+
     if request.method == 'POST':
         form = QuotationEditForm(request.POST, instance=quotation)
         if form.is_valid():
@@ -102,18 +125,18 @@ def QuotationAssign(request, pk):
             return redirect('dashboard')
     else:
         form = QuotationEditForm(instance=quotation)
-    
+
     context = {
         'form': form,
         'quotation': quotation
     }
-    
+
     return render(request, 'quotation_assign.html', context)
 
 @login_required(login_url='login')
 @role_required(allowed_roles=["Staff"])
 def QuotationList(request):
-        
+
         quotations_list=Quotation.objects.order_by('-quotation_number')
 
         quotations = Quotation.objects.all().annotate(
@@ -129,11 +152,11 @@ def QuotationList(request):
             total_lost=Sum('lost_count'),
             total_not_interested=Sum('not_interested_count')
         )
-    
+
         context={
             'quotations':quotations,
             'quotations_list':quotations_list
-        
+
         }
 
         return render(request, 'quotations_list.html', context)
@@ -148,7 +171,7 @@ def create_quotation_pricing(request, pk):
         if 'form_data' in request.POST:
             # Load the JSON data from the form_data field
             form_data = json.loads(request.POST['form_data'])
-            
+
             # Create and save instances for each row of data
             for data in form_data:
                 form = QuotationPricingForm(data)
@@ -172,12 +195,12 @@ def create_quotation_pricing(request, pk):
 @role_required(allowed_roles=["Staff"])
 def OrderDetails(request, pk):
     order=Order.objects.get(pk=pk)
-    
+
     order_amount = Decimal(order.order_amount)
     paid_amount = Decimal(order.paid_amount)
     due_amount = order_amount - paid_amount
 
-    
+
     context={
         'order':order,
         'due_amount':due_amount,
@@ -188,7 +211,7 @@ def OrderDetails(request, pk):
 @role_required(allowed_roles=["Staff",])
 def OrderAssign(request, pk):
     order = Order.objects.get(pk=pk)
-    
+
     if request.method == 'POST':
         form = OrderEditForm(request.POST, instance=order)
         if form.is_valid():
@@ -197,13 +220,13 @@ def OrderAssign(request, pk):
             return redirect('dashboard')
     else:
         form = OrderEditForm(instance=order, )
-    
+
     context = {
         'form': form,
         'order': order
 
     }
-    
+
     return render(request, 'order_assign.html', context)
 
 
@@ -211,7 +234,7 @@ def OrderAssign(request, pk):
 @role_required(allowed_roles=["Staff"])
 def OrderList(request):
     order_list = Order.objects.order_by('-order_number')
-    
+
     # Aggregate the counts for each status
     orders = Order.objects.all().aggregate(
         work_in_progress=Count('id', filter=Q(status='Work in Progress')),
@@ -235,7 +258,7 @@ def CustomerList(request):
     customer_list = User.objects.filter(userprofile__userrole='Customer')
 
     context = {
-       
+
         'customer_list': customer_list
     }
     return render(request, 'customer_list.html', context)
@@ -246,7 +269,7 @@ def ServiceManList(request):
     service_man_list = User.objects.filter(userprofile__userrole='Trade Person')
 
     context = {
-       
+
         'service_man_list': service_man_list
     }
     return render(request, 'service_man_list.html', context)
@@ -256,7 +279,7 @@ def ServiceManList(request):
 @role_required(allowed_roles=["Staff"])
 def CustomerDetails(request, pk):
     customer = get_object_or_404(User, userprofile__userrole='Customer', pk=pk)
-    
+
     context = {
         'customer': customer,
     }
@@ -266,11 +289,28 @@ def CustomerDetails(request, pk):
 @role_required(allowed_roles=["Staff"])
 def ServiceManDetails(request, pk):
     service_man = get_object_or_404(User, userprofile__userrole='Trade Person', pk=pk)
-    
+
     context = {
         'service_man': service_man,
     }
     return render(request, 'traders_details.html', context)
+
+
+
+
+def send_order_confirm(user_email, user_name):
+    subject = "TSD Traders - Received a Quotation Request"
+    from_email = "info@tsdtraders.com"
+    html_message = render_to_string('backend_email/order.html', {'user_email': user_email, 'user_name': user_name})
+    plain_message = strip_tags(html_message)
+
+    # List of recipients
+    recipients = [user_email, 'info@tsdtraders.com']
+
+    # Pass recipients directly, without wrapping it in another list
+    email = EmailMultiAlternatives(subject, plain_message, from_email, to=recipients)
+    email.attach_alternative(html_message, "text/html")
+    email.send()
 
 @login_required(login_url='login')
 @role_required(allowed_roles=["Customer"])
@@ -294,6 +334,8 @@ def CreateOrder(request, pk):
                 messages.error(request, "Payment amount must be at least 50% of the total amount.")
                 return render(request, 'customer/create_order.html', {'form': form, 'quotation': quotation, 'total_amount': total_amount})
 
+            email_thread = threading.Thread(target=send_order_confirm, args=(request.user.email,quotation.full_name))
+            email_thread.start()
             order.save()
             return redirect('customer_dashboard')  # Redirect to order detail page
     else:
@@ -309,14 +351,14 @@ def QuotationPricingView(request, pk):
     quotation_pricing_items = QuotationPricing.objects.filter(quotation=quotation)
     total_amount = sum(item.item_price for item in quotation_pricing_items)
     pay_to_wrok= (total_amount/2)
-   
+
 
     context = {
         'quotation': quotation,
         'quotation_pricing_items': quotation_pricing_items,
         'total_amount': total_amount,
         'pay_to_wrok':pay_to_wrok,
-       
+
     }
 
     return render(request, 'serviceman/quotation_pricing.html', context)
@@ -381,7 +423,7 @@ def CustomerDashboard(request):
     orders = Order.objects.filter(quotation__id__in=quotation_ids)
     all_quotation_count = quotation.count()
     all_order_count = orders.count()
-  
+
     context={
         'quotation':quotation,
         'orders':orders,
@@ -396,10 +438,10 @@ def CustomerDashboard(request):
 @role_required(allowed_roles=["Customer"])
 def CustomerQuotationList(request):
     user_email = request.user.email
-    
+
     quotation=Quotation.objects.filter(customer__email=user_email)
-    
-  
+
+
     context={
         'quotation':quotation,
         }
@@ -410,15 +452,15 @@ def CustomerQuotationList(request):
 @role_required(allowed_roles=["Customer"])
 def CustomerOrderList(request):
     user_email = request.user.email
-    
+
     quotation=Quotation.objects.filter(customer__email=user_email)
     quotation_ids = quotation.values_list('id', flat=True)
     orders = Order.objects.filter(quotation__id__in=quotation_ids)
-    
+
     context={
         'quotation':quotation,
         'orders':orders,
-       
+
     }
 
     return render(request, 'customer/customer_order_list.html', context)
@@ -428,7 +470,7 @@ def CustomerOrderList(request):
 def CustomerQuotationDetails(request, pk):
     user_email = request.user.email
     quotation=Quotation.objects.get(customer__email=user_email, pk=pk)
-    
+
     context = {
         'quotation': quotation,
     }
@@ -445,7 +487,7 @@ def CustomerOrderDetails(request, pk):
     order_amount = Decimal(order.order_amount)
     paid_amount = Decimal(order.paid_amount)
     due_amount = order_amount - paid_amount
-   
+
     context = {
         'order': order,
         'due_amount': due_amount,
@@ -455,20 +497,20 @@ def CustomerOrderDetails(request, pk):
 @login_required(login_url='login')
 @role_required(allowed_roles=["Trade Person"])
 def ServiceManDashboard(request):
-  
+
     # Retrieve the UserProfile associated with the logged-in user
     service_man_profile = UserProfile.objects.get(user=request.user)
 
     # Filter quotations assigned to the UserProfile
     quotations = Quotation.objects.filter(assigned_to=service_man_profile)
-    
+
     # Filter orders assigned to the UserProfile
     orders = Order.objects.filter(assigned_to=service_man_profile)
-    
+
     # Count the number of quotations and orders obtained
     all_quotation_count = quotations.count()
     all_order_count = orders.count()
-  
+
     context = {
         'quotation': quotations,
         'orders': orders,
@@ -483,7 +525,7 @@ def ServiceManDashboard(request):
 def ServiceManOrderList(request):
     service_man_profile = UserProfile.objects.get(user=request.user)
     orders = Order.objects.filter(assigned_to=service_man_profile)
-    
+
 
     context = {
         'orders': orders,
@@ -496,7 +538,7 @@ def ServiceManOrderList(request):
 def ServiceManQuotationList(request):
     service_man_profile = UserProfile.objects.get(user=request.user)
     quotations_list = Quotation.objects.filter(assigned_to=service_man_profile)
-    
+
 
     context = {
         'quotations_list': quotations_list,
@@ -511,7 +553,7 @@ def ServiceManQuotationDetails(request,pk):
 
     service_man_profile = UserProfile.objects.get(user=request.user)
     quotation = Quotation.objects.get(pk=pk, assigned_to=service_man_profile)
-    
+
     context={
         'quotation':quotation
     }
@@ -524,7 +566,7 @@ def ServiceManOrderDetails(request,pk):
 
     service_man_profile = UserProfile.objects.get(user=request.user)
     order = Order.objects.get(pk=pk, assigned_to=service_man_profile)
-    
+
     order_amount = Decimal(order.order_amount)
     paid_amount = Decimal(order.paid_amount)
     due_amount = order_amount - paid_amount
@@ -543,14 +585,14 @@ def CustomerQuotationPricingView(request, pk):
     quotation_pricing_items = QuotationPricing.objects.filter(quotation=quotation)
     total_amount = sum(item.item_price for item in quotation_pricing_items)
     pay_to_wrok= (total_amount/2)
-   
+
 
     context = {
         'quotation': quotation,
         'quotation_pricing_items': quotation_pricing_items,
         'total_amount': total_amount,
         'pay_to_wrok':pay_to_wrok,
-       
+
     }
 
     return render(request, 'customer/quotation_pricing.html', context)

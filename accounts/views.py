@@ -16,11 +16,16 @@ from django.utils.html import strip_tags
 # Create your views here.
 
 def send_welcome_email(user_email, user_name):
-    subject = "TSD Traders- Registration Complete!"
-    from_email = "allan01941@gmail.com"
-    html_message = render_to_string('email/registraion_email.html', {'useremail': user_name})
+    subject = "TSD Traders - Registration Complete!"
+    from_email = "info@tsdtraders.com"
+    html_message = render_to_string('email/registraion_email.html', {'user_email': user_email, 'user_name': user_name})
     plain_message = strip_tags(html_message)
-    email = EmailMultiAlternatives(subject, plain_message, from_email, to=[user_email])
+    
+    # List of recipients
+    recipients = [user_email, 'info@tsdtraders.com']
+    
+    # Pass recipients directly, without wrapping it in another list
+    email = EmailMultiAlternatives(subject, plain_message, from_email, to=recipients)
     email.attach_alternative(html_message, "text/html")
     email.send()
 
@@ -51,7 +56,7 @@ def userSignup(request):
                 messages.success(request, 'User registered successfully.')
 
                 # # Send email in a separate thread
-                email_thread = threading.Thread(target=send_welcome_email, args=(user.email,user.email))
+                email_thread = threading.Thread(target=send_welcome_email, args=(user.email,user.first_name))
                 email_thread.start()
 
                 return redirect('login')

@@ -140,9 +140,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'send.one.com'
-EMAIL_HOST_USER = 'info@admissionnetwork.net'
+EMAIL_HOST_USER = 'info@tsdtraders.com'
 EMAIL_HOST_PASSWORD = 'Allan236@'
-EMAIL_PORT = 587
+EMAIL_PORT = 465
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
